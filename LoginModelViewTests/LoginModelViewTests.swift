@@ -11,24 +11,42 @@ import XCTest
 
 class LoginModelViewTests: XCTestCase {
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
 
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
+    func testInvalidInput() throws {
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+        let expectation = self.expectation(description: "empty")
+        let userVM = UserVM("", password: "")
+        userVM.validateInput(userName: userVM.userName, password: userVM.password)
+        userVM.loginCompletionHandler { (status, message) in
+            XCTAssertFalse(status)
+            expectation.fulfill()
         }
+        self.callWait()
     }
+
+    func testValidInput() throws {
+
+        let expectation = self.expectation(description: "valid")
+        let userVM = UserVM("username", password: "password")
+        userVM.validateInput(userName: userVM.userName, password: userVM.password)
+        userVM.loginCompletionHandler { (status, message) in
+            XCTAssertTrue(status)
+            expectation.fulfill()
+        }
+        self.callWait()
+    }
+
+    func callWait()  {
+        self.waitForExpectations(timeout: 10) { (error) in
+            guard error == nil else {
+                XCTAssert(false)
+                NSLog("Timeout Error.")
+                return
+            }
+        }
+
+    }
+
+
 
 }
